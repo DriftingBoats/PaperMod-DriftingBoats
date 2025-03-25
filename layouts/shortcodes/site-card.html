@@ -1,0 +1,313 @@
+{{ $url := .Get 0 }}
+{{ $title := .Get 1 | default "" }}
+{{ $description := .Get 2 | default "" }}
+
+<div class="site-card" id="site-card-{{ $url | urlize }}" data-title="{{ $title }}" data-description="{{ $description }}">
+  <a class="site-card-link" href="{{ $url }}" target="_blank" rel="noopener noreferrer">
+    <!-- Header：左侧显示网站图标和标题（下方带描述），右侧显示外链图标 -->
+    <div class="site-card-header">
+      <div class="header-left">
+        <div class="site-favicon"></div>
+        <div class="site-info">
+          <div class="site-title">{{ $title }}</div>
+          <div class="site-description">{{ $description }}</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <svg class="external-link" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M15.5 2.25a.75.75 0 01.75-.75h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V4.06l-6.22 6.22a.75.75 0 11-1.06-1.06L19.94 3h-3.69a.75.75 0 01-.75-.75z"></path><path fill="currentColor" d="M2.5 4.25c0-.966.784-1.75 1.75-1.75h8.5a.75.75 0 010 1.5H4.25a.25.25 0 00-.25.25v15.5c0 .138.112.25.25.25h15.5a.25.25 0 00.25-.25v-8.5a.75.75 0 011.5 0v8.5a1.75 1.75 0 01-1.75 1.75H4.25a1.75 1.75 0 01-1.75-1.75V4.25z"></path></svg>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- CSS 样式 -->
+<style>
+  /* 整体卡片样式 */
+  .site-card {
+    width: 100%;
+    margin: 1em 0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1px solid rgba(208, 215, 222, 0.6);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    overflow: hidden;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .site-card:hover {
+    background-color: #f6f8fa;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+  }
+  .site-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  /* Header 部分 */
+  .site-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.2em;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+  }
+  .site-favicon {
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+    background-size: contain;
+    background-position: center;
+    image-rendering: crisp-edges;
+    background-repeat: no-repeat;
+    background-color: rgba(0,0,0,0.05);
+    animation: fade-in 0.3s ease;
+    flex-shrink: 0;
+    background-image: var(--dynamic-favicon), url('/images/default-favicon.svg');
+  }
+  .site-card:hover .site-favicon {
+    transform: scale(1.05);
+  }
+  .site-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+    min-width: 0;
+    flex: 1;
+  }
+  .site-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #0969da;
+    letter-spacing: -0.01em;
+  }
+  .site-description {
+    font-size: 0.9em;
+    color: #57606a;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .header-right {
+    margin-left: auto;
+  }
+  .external-link {
+    width: 20px;
+    height: 20px;
+    color: #57606a;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .site-card:hover .external-link {
+    transform: scale(1.1);
+    color: #24292f;
+  }
+  /* 响应式设置 */
+  @media (max-width: 480px) {
+    .site-card {
+      margin: 1em 0;
+      width: 100%;
+      border-radius: 10px;
+    }
+    .site-card-header {
+      padding: 1em;
+    }
+    .header-left {
+      gap: 0.6em;
+      align-items: flex-start;
+      width: calc(100% - 24px);
+    }
+    .site-favicon {
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      margin-top: 0.2em;
+    }
+    .site-info {
+      gap: 0.3em;
+      min-width: 0;
+      flex: 1;
+    }
+    .site-title {
+      font-size: 1em;
+      line-height: 1.3;
+      word-wrap: break-word;
+    }
+    .site-description {
+      font-size: 0.85em;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+  }
+  /* 深色模式适配 */
+  .dark .site-card {
+    background-color: #2a2a2a;
+    border-color: #404040;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .dark .site-card:hover {
+    background-color: #333333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  .dark .site-title {
+    color: #58a6ff;
+  }
+  .dark .site-description {
+    color: #d4d4d4;
+  }
+  .dark .external-link {
+    color: #d4d4d4;
+  }
+  .dark .site-card:hover .external-link {
+    color: #ffffff;
+  }
+</style>
+
+<!-- JS：动态加载网站图标 -->
+<script>
+  (function() {
+    const url = "{{ $url }}";
+    const cardId = "site-card-{{ $url | urlize }}";
+    
+    function getFaviconUrl(url) {
+      try {
+        const urlObj = new URL(url);
+        return `${urlObj.protocol}//${urlObj.hostname}/favicon.ico`;
+      } catch (e) {
+        console.error("Invalid URL:", e);
+        return null;
+      }
+    }
+    
+    async function fetchMetaData(url) {
+      try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname;
+        
+        try {
+  const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+  if (!response.ok) {
+    throw new Error('Metadata API request failed');
+  }
+  
+  const data = await response.json();
+  const metadata = data.data;
+  
+  // 更新卡片信息
+  const card = document.getElementById(cardId);
+  const title = metadata?.title || new URL(url).hostname;
+  const description = metadata?.description || '';
+  
+  card.dataset.title = title;
+  card.dataset.description = description;
+  card.querySelector('.site-title').textContent = title;
+  card.querySelector('.site-description').textContent = description;
+  
+  // 添加本地缓存
+  localStorage.setItem(`meta_${url}`, JSON.stringify({
+    title,
+    description,
+    timestamp: Date.now()
+  }));
+} catch (error) {
+  console.error('Error fetching metadata:', error);
+  // 在获取失败时返回域名作为标题
+  const urlObj = new URL(url);
+  const card = document.getElementById(cardId);
+  card.dataset.title = urlObj.hostname;
+  card.querySelector('.site-title').textContent = urlObj.hostname;
+}
+        
+        if (!response.ok) {
+          throw new Error('Metadata API request failed');
+        }
+        
+        const metadata = await response.json();
+        // 添加本地缓存
+        localStorage.setItem(`meta_${url}`, JSON.stringify({
+          title: metadata.title,
+          description: metadata.description,
+          timestamp: Date.now()
+        }));
+
+        // 尝试获取apple-touch-icon
+        const appleIconResponse = await fetch(`${urlObj.protocol}//${urlObj.hostname}/apple-touch-icon.png`);
+        // 优化图标获取顺序：1.apple-touch-icon 2.favicon.png 3.Google服务
+const appleIcon = `${urlObj.protocol}//${urlObj.hostname}/apple-touch-icon.png`;
+const hdFavicon = `${urlObj.protocol}//${urlObj.hostname}/favicon.png`;
+
+const faviconUrl = await testImage(appleIcon) || 
+                   await testImage(hdFavicon) || 
+                   `https://www.google.com/s2/favicons?domain=${encodeURIComponent(url)}&sz=128`;
+        
+        return {
+          title: metadata?.title || hostname,
+          description: metadata?.description || '',
+          faviconUrl: faviconUrl
+        };
+      } catch (error) {
+        console.error('Error fetching metadata:', error);
+        // 在获取失败时返回域名作为标题
+        const urlObj = new URL(url);
+        return { 
+          title: urlObj.hostname,
+          description: ''
+        };
+      }
+    }
+
+    function loadFavicon(url, elementId) {
+      const faviconUrl = getFaviconUrl(url);
+      if (!faviconUrl) return;
+      
+      const cardEl = document.getElementById(elementId);
+      if (!cardEl) return;
+      
+      const faviconEl = cardEl.querySelector('.site-favicon');
+      if (!faviconEl) return;
+      
+      // 创建一个临时图片元素来测试图标是否存在
+      const img = new Image();
+      img.onload = function() {
+        faviconEl.style.backgroundImage = `url(${faviconUrl})`;
+      };
+      img.onerror = function() {
+        // 如果找不到favicon.ico，尝试使用Google的favicon服务
+        const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(url)}&sz=64`;
+        faviconEl.style.backgroundImage = `url(${googleFaviconUrl})`;
+      };
+      img.src = faviconUrl;
+    }
+    
+    async function updateCardContent(url, cardId) {
+      const cardEl = document.getElementById(cardId);
+      if (!cardEl) return;
+
+      const titleEl = cardEl.querySelector('.site-title');
+      const descriptionEl = cardEl.querySelector('.site-description');
+      
+      // 如果没有提供标题或描述，从网页获取
+      if (!cardEl.dataset.title || !cardEl.dataset.description) {
+        const metadata = await fetchMetaData(url);
+        if (!cardEl.dataset.title && titleEl) {
+          titleEl.textContent = metadata.title;
+        }
+        if (!cardEl.dataset.description && descriptionEl) {
+          descriptionEl.textContent = metadata.description;
+        }
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFavicon(url, cardId);
+      updateCardContent(url, cardId);
+    });
+  })();
+</script>
