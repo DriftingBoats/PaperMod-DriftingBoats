@@ -3,6 +3,9 @@
     <header class="entry-header">
         <h1>{{ .Title | markdownify }}</h1>
     </header>
+    <section class="heatmap-section">
+        {{ partial "heatmap.html" . }}
+    </section>
     <div class="entry-content">
         {{ .Content | markdownify }}
     </div>

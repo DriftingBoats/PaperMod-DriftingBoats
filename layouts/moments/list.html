@@ -1,0 +1,456 @@
+{{ define "main" }}
+
+    <!-- 如果需要引入 moments.css，请保持路径一致或根据自己项目结构调整 -->
+    {{ $css := resources.Get "css/extended/moments.css" | minify | fingerprint }}
+    <link
+        crossorigin="anonymous"
+        href="{{ $css.RelPermalink }}"
+        integrity="{{ $css.Data.Integrity }}"
+        rel="stylesheet"
+    />
+
+    {{ $dateformat := .Params.DateFormat }}
+
+    <article class="post-single">
+        <header class="page-header">
+            <!-- 可根据需求添加页面标题、描述等 -->
+            <!-- <h1>{{ .Title }}</h1> -->
+        </header>
+
+        <div class="tags-filter">
+            <ul>
+                <li><a href="#" class="tag-filter all-tags">全部</a></li> <!-- "全部"选项 -->
+                {{ $tags := slice }} <!-- 用于存储所有标签 -->
+                
+                {{ range .Pages }}
+                    {{ range .Params.tags }}
+                        {{ if not (in $tags .) }}
+                            {{ $tags = $tags | append . }}
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+        
+                <!-- 按字母顺序排序标签 -->
+                {{ $tags = $tags | sort }}
+        
+                {{ range $tags }}
+                    <li><a href="#" class="tag-filter">{{ . }}</a></li> <!-- 标签项 -->
+                {{ end }}
+            </ul>
+        </div>        
+         
+        <div class="post-content">
+            <div class="moments-list">
+                {{ range .Pages }}
+                    {{ if .Content }}
+                        <!-- 卡片容器 -->
+                        <div class="moment-card">
+                            <!-- 头部：头像 + 作者名 -->
+                            <div class="moment-header">
+                                <div class="left-content">
+                                    <img
+                                        src="{{ site.Params.label.avatar }}"
+                                        alt="{{ site.Params.author }}"
+                                        class="moment-avatar"
+                                    >
+                                    <span class="moment-author">
+                                        {{ site.Params.author }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- 动态主体内容（Hugo 渲染后的 .Content） -->
+                            <div class="moment-body">
+                                <div class="moment-content-wrapper">
+                                    {{ .Content | safeHTML }}
+                                </div>
+                                <div class="moment-loading">
+                                    <div class="loading-spinner"></div>
+                                    <div class="skeleton-content">
+                                        <div class="skeleton-line" style="width: 90%"></div>
+                                        <div class="skeleton-line" style="width: 75%"></div>
+                                        <div class="skeleton-line" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div class="moment-error" style="display: none;">
+                                    <span>图片加载失败</span>
+                                    <button onclick="retryLoad(this)">重试</button>
+                                </div>
+                            </div>
+
+                            <!-- 标签（如果有） -->
+                            {{ if .Params.tags }}
+                                <div class="moment-tags">
+                                    {{ range $tag := .Params.tags }}
+                                        <span class="moment-tag">{{ $tag }}</span>
+                                    {{ end }}
+                                </div>
+                            {{ end }}
+
+                            <!-- 底部：时间 + 评论按钮 -->
+                            <div class="moment-bottom">
+                                <div class="moment-time">
+                                    <span>
+                                        {{ .Param "date" | time.Format (default site.Params.DateFormat $dateformat) }}
+                                    </span>
+                                </div>
+                                <!-- 如果没有 hideComment 参数，则显示评论按钮 -->
+                                {{ if not (.Param "hideComment") }}
+                                <button
+                                    class="moment-comment-btn"
+                                    onclick="showComment(this)"
+                                    data-slug="{{ .Param "slug" }}"
+                                    data-path="{{ .Param "slug" }}"
+                                >
+                                    <!-- 评论图标 SVG -->
+                                    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M281.535354 387.361616c-31.806061 0-57.664646 26.763636-57.664647 59.733333 0 32.969697 25.858586 59.733333 57.664647 59.733334s57.664646-26.763636 57.664646-59.733334c0-33.09899-25.858586-59.733333-57.664646-59.733333z m230.529292 0c-31.806061 0-57.664646 26.763636-57.664646 59.733333 0 32.969697 25.729293 59.733333 57.664646 59.733334 31.806061 0 57.535354-26.763636 57.535354-59.733334 0-33.09899-25.858586-59.733333-57.535354-59.733333z m230.4 0c-31.806061 0-57.664646 26.763636-57.664646 59.733333 0 32.969697 25.858586 59.733333 57.664646 59.733334s57.664646-26.763636 57.664647-59.733334c-0.129293-33.09899-25.858586-59.733333-57.664647-59.733333z m115.2-270.222222H166.335354c-63.612121 0-115.2 53.527273-115.2 119.59596v390.981818c0 65.939394 52.751515 126.836364 117.785858 126.836363h175.579798c30.513131 32.581818 157.220202 149.979798 157.220202 149.979798 5.559596 5.818182 14.739394 5.818182 20.29899 0 0 0 92.832323-91.410101 153.212121-149.979798h179.717172c65.034343 0 117.785859-60.89697 117.785859-126.836363V236.606061c0.129293-65.939394-51.458586-119.466667-115.070708-119.466667z m57.535354 510.577778c0 32.969697-27.668687 67.620202-60.250505 67.620202H678.335354c-21.462626 0-40.727273 21.979798-40.727273 21.979798l-124.121212 114.941414-124.121212-114.941414s-23.660606-21.979798-43.830303-21.979798H168.921212c-32.581818 0-60.250505-34.650505-60.250505-67.620202V236.606061c0-32.969697 25.729293-59.733333 57.664647-59.733334h691.329292c31.806061 0 57.535354 26.763636 57.535354 59.733334v391.111111z m0 0"></path></svg>
+                                    <!-- 评论按钮文字 -->
+                                    <span class="comment-text">评论 ({{ .Params.comments_count | default "0" }})</span> 
+                                </button>
+                                {{ end }}
+                            </div>
+
+                            <!-- 评论容器：点击按钮后会在这里渲染 Waline 评论 -->
+                            <div
+                                class="waline-container"
+                                id="waline-{{ .Param "slug" }}"
+                                data-path="{{ .Param "slug" }}"
+                            ></div>
+                        </div>
+                    {{ end }}
+                {{ end }}
+            </div>
+        </div>
+    </article>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 图片懒加载和预加载处理
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const wrapper = img.closest('.moment-content-wrapper');
+                        const loadingEl = wrapper.nextElementSibling;
+                        const errorEl = loadingEl.nextElementSibling;
+
+                        // 显示加载状态
+                        loadingEl.style.display = 'flex';
+                        errorEl.style.display = 'none';
+
+                        // 创建新的Image对象用于预加载
+                        const tempImg = new Image();
+                        tempImg.onload = function() {
+                            img.src = img.dataset.src;
+                            img.classList.add('loaded');
+                            loadingEl.style.display = 'none';
+                            observer.unobserve(img);
+                        };
+                        tempImg.onerror = function() {
+                            loadingEl.style.display = 'none';
+                            errorEl.style.display = 'block';
+                        };
+                        tempImg.src = img.dataset.src;
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.1
+            });
+
+            // 处理所有图片元素
+            document.querySelectorAll('.moment-content-wrapper').forEach(wrapper => {
+                const loadingEl = wrapper.nextElementSibling;
+                const images = wrapper.querySelectorAll('img');
+                
+                if (images.length === 0) {
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+
+                let loadedImages = 0;
+                images.forEach(img => {
+                    if (img.src) {
+                        img.dataset.src = img.src;
+                        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // 透明占位图
+                        imageObserver.observe(img);
+                        
+                        // 监听图片加载完成
+                        img.onload = () => {
+                            loadedImages++;
+                            if (loadedImages === images.length) {
+                                loadingEl.style.display = 'none';
+                            }
+                        };
+                    }
+                });
+            });
+
+            // 重试加载功能
+            window.retryLoad = function(button) {
+                const errorEl = button.closest('.moment-error');
+                const loadingEl = errorEl.previousElementSibling;
+                const wrapper = loadingEl.previousElementSibling;
+                const img = wrapper.querySelector('img');
+
+                errorEl.style.display = 'none';
+                loadingEl.style.display = 'flex';
+
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    img.src = img.dataset.src;
+                    img.classList.add('loaded');
+                    loadingEl.style.display = 'none';
+                };
+                tempImg.onerror = function() {
+                    loadingEl.style.display = 'none';
+                    errorEl.style.display = 'block';
+                };
+                tempImg.src = img.dataset.src;
+            };
+
+            // 新增分页相关变量
+            let currentPage = 1;
+            const pageSize = {{ .Site.Params.moments.pageSize | default 8 }};
+            let filteredMoments = [];
+            let isLoading = false;
+            let isAllLoaded = false;
+            let loadingTimeout = null;
+            const loadingHint = document.createElement('div');
+            loadingHint.className = 'scroll-hint-container';
+            loadingHint.innerHTML = '<div class="loading-hint">加载更多...</div>';
+            document.querySelector('.moments-list').after(loadingHint);
+
+            // 显示分页内容的方法
+            function displayMoments() {
+                const end = currentPage * pageSize;
+                const totalItems = filteredMoments.length;
+                
+                // 优化显示逻辑，只处理新增的内容
+                const start = (currentPage - 1) * pageSize;
+                filteredMoments.slice(start, end).forEach(moment => {
+                    moment.style.display = 'block';
+                    // 触发图片懒加载重新检查
+                    moment.querySelectorAll('img[data-src]').forEach(img => {
+                        imageObserver.observe(img);
+                    });
+                });
+
+                // 更新底部提示
+                const hasMore = end < totalItems;
+                isAllLoaded = !hasMore;
+                
+                if (totalItems === 0) {
+                    loadingHint.innerHTML = '<div class="end-divider">暂无内容</div>';
+                } else if (isAllLoaded) {
+                    loadingHint.innerHTML = '<div class="end-divider">———— · 已到底部 · ————</div>';
+                } else {
+                    loadingHint.innerHTML = '<div class="loading-hint">加载更多...</div>';
+                }
+                loadingHint.style.display = 'block';
+            }
+
+            // 优化的滚动事件处理
+            function checkScroll() {
+                if (isLoading || isAllLoaded || filteredMoments.length === 0) return;
+                
+                const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+                const threshold = 200; // 增加阈值，提前开始加载
+                const end = currentPage * pageSize;
+                
+                if (end < filteredMoments.length && scrollTop + clientHeight >= scrollHeight - threshold) {
+                    isLoading = true;
+                    loadingHint.innerHTML = '<div class="loading-hint"><div class="loading-spinner"></div>加载中...</div>';
+                    
+                    // 清除之前的超时
+                    if (loadingTimeout) {
+                        clearTimeout(loadingTimeout);
+                    }
+                    
+                    // 使用 requestAnimationFrame 和防抖优化性能
+                    requestAnimationFrame(() => {
+                        loadingTimeout = setTimeout(() => {
+                            currentPage++;
+                            displayMoments();
+                            isLoading = false;
+                            loadingTimeout = null;
+                        }, 300);
+                    });
+                }
+            }
+
+            // 点击标签时筛选逻辑
+            const tags = document.querySelectorAll('.tag-filter');  // 获取所有标签
+            const moments = document.querySelectorAll('.moment-card');  // 获取所有 moment 卡片
+            const allTags = document.querySelector('.all-tags');  // 获取"全部"按钮
+            const momentTags = document.querySelectorAll('.moment-tag'); // 获取所有卡片内的标签
+
+            // 默认选中"全部"标签
+            if (allTags) {
+                allTags.classList.add('selected');
+            }
+
+            // 点击标签时进行筛选
+            tags.forEach(tag => {
+                tag.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const selectedTag = tag.textContent.trim();
+                    
+                    filteredMoments = Array.from(moments).filter(moment => {
+                        const momentTags = moment.querySelectorAll('.moment-tag');
+                        return selectedTag === '全部' || 
+                            Array.from(momentTags).some(t => t.textContent === selectedTag);
+                    });
+
+                    currentPage = 1;
+                    displayMoments();
+                    window.scrollTo(0, 0); // 筛选后回到顶部
+                    
+                    tags.forEach(t => t.classList.remove('selected'));
+                    tag.classList.add('selected');
+                });
+            });
+
+            // 为卡片内的标签添加点击事件
+            momentTags.forEach(tag => {
+                tag.style.cursor = 'pointer';
+                tag.addEventListener('click', function() {
+                    const tagText = this.textContent.trim();
+                    // 找到对应的顶部标签并触发点击
+                    tags.forEach(headerTag => {
+                        if (headerTag.textContent.trim() === tagText) {
+                            headerTag.click();
+                        }
+                    });
+                });
+            });
+
+            // 初始加载
+            filteredMoments = Array.from(moments);
+            displayMoments();
+            // 确保提示容器正确插入
+            const existingHint = document.querySelector('.scroll-hint-container');
+            if (!existingHint) {
+                const hintContainer = document.createElement('div');
+                hintContainer.className = 'scroll-hint-container';
+                document.querySelector('.moments-list').after(hintContainer);
+            }
+            window.addEventListener('scroll', checkScroll);
+        });
+    </script>
+
+    <!-- 在页面底部引入 Waline 评论脚本并初始化 -->
+    <script type="module">
+        import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+        
+        const walineParams = {
+            /* 这里根据你自己的 Waline 配置进行调整 */
+            serverURL: '{{ .Site.Params.waline.serverURL }}',
+            lang: '{{ .Site.Params.waline.lang | default "zh-CN" }}',
+            visitor: '{{ .Site.Params.waline.visitor | default "匿名者" }}',
+            emoji: [
+                {{- range .Site.Params.waline.emoji }}
+                    '{{ . }}',
+                {{- end }}
+            ],
+            requiredMeta: [
+                {{- range .Site.Params.waline.requiredMeta }}
+                    '{{ . }}',
+                {{- end }}
+            ],
+            locale: {
+                admin: '{{ .Site.Params.waline.locale.admin | default "作者本人" }}',
+                placeholder: '{{ .Site.Params.waline.locale.placeholder | default "🍗所以我配有一条评论吗！" }}',
+            },
+            dark: '{{ .Site.Params.waline.dark | default "html.dark" }}',
+        };
+        
+        // 点击"添加评论"按钮时，显示对应卡片下的评论区
+        window.showComment = function(element) {
+            const slug = element.getAttribute('data-slug');
+            const path = element.getAttribute('data-path');
+            const commentElement = document.getElementById('waline-' + slug);
+
+            // 如果已激活则清空
+            if (commentElement.classList.contains('active')) {
+                commentElement.classList.remove('active');
+                commentElement.innerHTML = '';
+                return;
+            }
+
+            // 移除其它所有已激活评论区
+            const allComments = document.querySelectorAll('.waline-container');
+            allComments.forEach(el => {
+                el.classList.remove('active');
+                el.innerHTML = '';
+            });
+
+            // 激活当前评论区
+            commentElement.classList.add('active');
+
+            // 初始化 Waline
+            init({
+                el: commentElement,
+                serverURL: walineParams.serverURL,
+                lang: walineParams.lang,
+                visitor: walineParams.visitor,
+                emoji: walineParams.emoji,
+                requiredMeta: walineParams.requiredMeta,
+                locale: walineParams.locale,
+                path: path,
+                dark: walineParams.dark,
+            });
+        }
+    </script>
+
+    <!-- 获取评论数 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有评论按钮
+            const commentBtns = document.querySelectorAll('.moment-comment-btn');
+
+            // 确保有找到评论按钮
+            if (commentBtns.length > 0) {
+                commentBtns.forEach(button => {
+                    const slug = button.getAttribute('data-slug');  // 获取按钮对应的 slug
+                    const commentText = button.querySelector('.comment-text');  // 获取按钮中的评论文本
+                    const serverURL = '{{ .Site.Params.waline.serverURL }}';  // 获取 Waline 服务器地址
+
+                    // 输出调试信息，查看是否有多个按钮
+                    console.log(`Processing button with slug: ${slug}`);
+
+                    if (slug && commentText) {
+                        // 假设你有一个获取评论数量的 API 或接口
+                        fetch(`${serverURL}/api/comment?type=count&url=${slug}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (commentText) {
+                                    // 从 API 返回的数据中提取评论数
+                                    const commentCount = data.data && data.data[0] ? data.data[0] : 0;  // 如果没有数据或评论数，默认为 0
+                                    
+                                    // 输出调试信息，查看评论数
+                                    console.log(`Fetched comment count: ${commentCount}`);
+
+                                    // 更新评论按钮上的评论数量
+                                    commentText.textContent = `评论 (${commentCount})`;  // 更新评论数
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching comment count:', error);
+                                if (commentText) {
+                                    // 如果 API 请求失败，保持评论数为 0
+                                    commentText.textContent = `评论 (0)`;
+                                }
+                            });
+                    } else {
+                        console.error('Slug or commentText missing for button:', button);
+                    }
+                });
+            } else {
+                console.error('No comment buttons found');
+            }
+        });
+    </script>
+
+{{ end }}

@@ -1,0 +1,39 @@
+{{ $platform := "" }}
+{{ $repo := "" }}
+
+{{ if .IsNamedParams }}
+    {{- $platform = .Get "platform" -}}
+    {{- $repo = .Get "repo" -}}
+{{ else }}
+    {{ $url := .Get 0 }}
+    {{ $regex := `^https?://(?:[a-z0-9.-]+\.)*([a-z0-9.-]+)\.[a-z]{2,}/(.*)` }}
+    {{ $matches := findRESubmatch $regex $url }}
+    {{ $platform = index (index $matches 0) 1 }}
+    {{ $repo = index (index $matches 0) 2 }}
+{{ end }}
+
+
+<div class="pe-git {{ $platform }}">
+    <div class="pe-git-platform">
+        <div class="pe-loading">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div class="pe-git-info">
+        <div class="pe-git-repo-name">
+            {{ $repo }}
+        </div>
+        <div class="pe-git-description"></div>
+        <div class="pe-git-extend">
+            <span class="pe-git-language"></span>
+            <div class="pe-git-count"></div>
+        </div>
+    </div>
+</div>

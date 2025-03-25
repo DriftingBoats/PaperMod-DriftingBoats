@@ -1,0 +1,69 @@
+<!-- 图片加载优化配置 -->
+<script>
+  // 懒加载配置
+  document.addEventListener('DOMContentLoaded', function() {
+    var lazyImages = [].slice.call(document.querySelectorAll('img[data-src]'));
+
+    if ('IntersectionObserver' in window) {
+      let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            let lazyImage = entry.target;
+            lazyImage.src = lazyImage.dataset.src;
+            lazyImage.removeAttribute('data-src');
+            lazyImageObserver.unobserve(lazyImage);
+          }
+        });
+      });
+
+      lazyImages.forEach(function(lazyImage) {
+        lazyImageObserver.observe(lazyImage);
+      });
+    }
+  });
+
+  // Fancybox延迟加载
+  function loadFancybox() {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css';
+    document.head.appendChild(link);
+
+    script.onload = function() {
+      Fancybox.bind('[data-fancybox]', {
+        Images: {
+          protected: true,
+        },
+        Toolbar: {
+          display: [
+            { id: 'prev', position: 'center' },
+            { id: 'counter', position: 'center' },
+            { id: 'next', position: 'center' },
+            'zoom',
+            'slideshow',
+            'fullscreen',
+            'download',
+            'close',
+          ],
+        },
+      });
+    };
+  }
+
+  // 当用户滚动到图片附近时才加载Fancybox
+  let fancyboxLoaded = false;
+  window.addEventListener('scroll', function() {
+    if (!fancyboxLoaded && document.querySelector('[data-fancybox]')) {
+      const rect = document.querySelector('[data-fancybox]').getBoundingClientRect();
+      if (rect.top < window.innerHeight + 500) {
+        loadFancybox();
+        fancyboxLoaded = true;
+      }
+    }
+  });
+</script>

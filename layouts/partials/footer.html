@@ -4,7 +4,7 @@
         {{- if site.Copyright }}
         <span>{{ site.Copyright | markdownify }}</span>
         {{- else }}
-        <span>&copy; {{ now.Year }} <a href="{{ "" | absLangURL }}">{{ site.Title }}</a></span>
+        <span>&copy;{{ site.Params.StartYear }}-{{ now.Year }} <a href="{{ "" | absLangURL }}">{{ site.Title }}</a></span>
         {{- end }}
         {{- print " · "}}
     {{- end }}
@@ -142,3 +142,6 @@
     });
 </script>
 {{- end }}
+
+{{ $codeJS := resources.Get "js/code.js" | minify | fingerprint }}
+<script defer src="{{ $codeJS.RelPermalink }}" integrity="{{ $codeJS.Data.Integrity }}"></script>

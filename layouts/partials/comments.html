@@ -1,3 +1,50 @@
-{{- /* Comments area start */ -}}
-{{- /* to add comments read => https://gohugo.io/content-management/comments/ */ -}}
-{{- /* Comments area end */ -}}
+<!-- layouts/partials/comments.html -->
+{{- if .Site.Params.comments }}
+    <!-- 评论容器 -->
+    <div class="waline-container" data-path="{{ .Permalink | relURL }}"></div>
+    <link href="https://unpkg.com/@waline/client@v3/dist/waline.css" rel="stylesheet" />
+
+    <!-- 初始化 Waline 的脚本 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // 初始化 Waline
+            const walineInit = () => {
+                import('https://unpkg.com/@waline/client@v3/dist/waline.js').then(({ init }) => {
+                    const walineContainers = document.querySelectorAll('.waline-container[data-path]');
+                    walineContainers.forEach(container => {
+                        if (!container.__waline__) {
+                            const path = container.getAttribute('data-path');
+                            container.__waline__ = init({
+                                el: container,
+                                serverURL: '{{ .Site.Params.waline.serverURL }}',
+                                lang: '{{ .Site.Params.waline.lang }}',
+                                visitor: '{{ .Site.Params.waline.visitor | default "匿名者" }}',
+                                emoji: [
+                                    {{- range .Site.Params.waline.emoji }}
+                                        '{{ . }}',
+                                    {{- end }}
+                                ],
+                                requiredMeta: [
+                                    {{- range .Site.Params.waline.requiredMeta }}
+                                        '{{ . }}',
+                                    {{- end }}
+                                ],
+                                locale: {
+                                    admin: '{{ .Site.Params.waline.locale.admin }}',
+                                    placeholder: '{{ .Site.Params.waline.locale.placeholder }}',
+                                },
+                                path: path,
+                                dark: '{{ .Site.Params.waline.dark | default "body.dark" }}', 
+                            });
+                        }
+                    });
+                }).catch(error => {
+                    console.error("Waline 初始化失败：", error);
+                });
+            };
+
+            walineInit();
+        });
+    </script>
+{{- end }}

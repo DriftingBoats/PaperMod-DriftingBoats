@@ -155,3 +155,7 @@
 {{- template "partials/templates/twitter_cards.html" . }}
 {{- template "partials/templates/schema_json.html" . }}
 {{- end -}}
+
+{{- /* 代码块样式 */ -}}
+{{ $codeCSS := resources.Get "css/extended/code.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $codeCSS.RelPermalink }}" integrity="{{ $codeCSS.Data.Integrity }}">

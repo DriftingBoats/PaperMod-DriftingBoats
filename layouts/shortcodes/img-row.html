@@ -1,0 +1,3 @@
+<div class="image-row {{ if .Get "type" }}image-row-{{ .Get "type" }}{{ else }}image-row-1col{{ end }}">
+  {{ .Inner | markdownify }}
+</div>

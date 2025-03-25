@@ -1,0 +1,8 @@
+<div class="note note-{{ .Get "type" | default "default" }}" style="{{ .Get "style" }}">
+    {{ if .Get "title" }}
+        <strong class="note-title">{{ .Get "title" }}</strong>
+    {{ end }}
+    <div class="note-content">
+        {{ .Inner }}
+    </div>
+</div>

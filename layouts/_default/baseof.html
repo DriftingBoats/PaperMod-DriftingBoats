@@ -6,6 +6,9 @@
 <html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}">
 
 <head>
+    {{- if .Site.Params.comments }}
+        <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+    {{- end }}
     {{- partial "head.html" . }}
 </head>
 

@@ -1,0 +1,23 @@
+{{- $inner := .Inner | .Page.RenderString -}}
+
+{{- $platformMap := dict "chatgpt" "ChatGPT" -}}
+{{- $platformMap = dict "openai" "ChatGPT" | merge $platformMap -}}
+{{- $platformMap = dict "bing" "Microsoft Copilot" | merge $platformMap -}}
+{{- $platformMap = dict "microsoft" "Microsoft Copilot" | merge $platformMap -}}
+{{- $platformMap = dict "google" "Gemini" | merge $platformMap -}}
+{{- $platformMap = dict "alibaba" "通义千问" | merge $platformMap -}}
+
+{{ $displayName := "AI" }}
+
+{{ if .Get 0 }}
+{{ $displayName = index $platformMap (.Get 0 | lower) | default "AI" }}
+{{ end }}
+
+
+<div class="pe-ai-content">
+    <div class="pe-ai-text">{{ $inner }}</div>
+    <div class="pe-ai-bottom">
+        <span class="pe-ai-label">Powered by </span>
+        <span class="pe-ai-icon">{{ $displayName }}</span>
+    </div>
+</div>

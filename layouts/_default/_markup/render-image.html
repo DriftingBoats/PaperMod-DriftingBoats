@@ -1,22 +1,36 @@
-{{- $u := urls.Parse .Destination -}}
-{{- $src := $u.String -}}
-{{- if not $u.IsAbs -}}
-  {{- $path := strings.TrimPrefix "./" $u.Path }}
-  {{- with or (.PageInner.Resources.Get $path) (resources.Get $path) -}}
-    {{- $src = .RelPermalink -}}
-    {{- with $u.RawQuery -}}
-      {{- $src = printf "%s?%s" $src . -}}
-    {{- end -}}
-    {{- with $u.Fragment -}}
-      {{- $src = printf "%s#%s" $src . -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-{{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
-<img
-  {{- range $k, $v := $attributes -}}
-    {{- if $v -}}
-      {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
-    {{- end -}}
-  {{- end -}}>
-{{- /**/ -}}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Image</title>
+    <style>
+        .post-img-view {
+            text-align: center;
+        }
+        .responsive-image {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    {{ if .Page.Site.Params.fancybox }}
+    <div class="post-img-view">
+        <a data-fancybox="gallery" href="{{ .Destination | safeURL }}">
+            <img class="responsive-image" src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title}} title="{{ . }}"{{ end }} style="margin: 0 auto;"/>
+        </a>
+    </div>
+    {{ end }}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var images = document.querySelectorAll(".responsive-image");
+            var maxHeight = window.innerHeight / 3;
+            images.forEach(function(image) {
+                image.style.maxHeight = maxHeight + "px";
+            });
+        });
+    </script>
+</body>
+</html>

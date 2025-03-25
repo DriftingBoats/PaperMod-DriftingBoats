@@ -1,0 +1,19 @@
+{{ $.Scratch.Set "key" false }}
+{{ $.Scratch.Set "value" false }}
+
+{{ if .IsNamedParams }}
+{{ $.Scratch.Set "key" (.Get "key") }}
+{{ $.Scratch.Set "value" (.Get "value") }}
+{{ else }}
+{{ $.Scratch.Set "key" (.Get 0) }}
+{{ $.Scratch.Set "value" (.Get 1) }}
+{{ end }}
+
+<span class="pe-badge">
+    <span class="pe-badge-key">
+        {{ $.Scratch.Get "key" }}
+    </span>
+    <span class="pe-badge-value">
+        {{ $.Scratch.Get "value" }}
+    </span>
+</span>

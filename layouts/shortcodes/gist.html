@@ -1,0 +1,6 @@
+{{ if len .Params | eq 1 }}
+{{ $params := split (.Get 0) "#" }}
+<script src="https://gist.github.com/{{ index $params 0 }}.js{{if len $params | eq 2 }}?file={{ index $params 1 }}{{end}}"></script>
+{{ else }}
+<script src="https://gist.github.com/{{ index .Params 0 }}/{{ index .Params 1 }}.js{{if len .Params | eq 3 }}?file={{ index .Params 2 }}{{end}}"></script>
+{{ end }}

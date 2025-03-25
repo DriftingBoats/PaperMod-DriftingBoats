@@ -1,0 +1,286 @@
+<!-- 热力图容器 -->
+<div class="heatmap-container">
+  <div id="heatmap"></div>
+</div>
+
+<!-- 引入 ECharts 的 JS 库 -->
+<script src="https://lib.baomitu.com/echarts/5.3.3/echarts.min.js"></script>
+
+<!-- 模态窗口结构 -->
+<div id="articleModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modalDate" style="color: #04271f;">日期</h2>
+    <ul id="modalPosts" class="article-list">
+      <!-- 文章列表将在这里生成 -->
+    </ul>
+  </div>
+</div>
+
+<!-- 样式 -->
+<style>
+  /* 让容器固定高度 250px，去除原先的 padding-bottom */
+  .heatmap-container {
+    width: 100%;
+    height: 200px; /* 固定高度 250px */
+    position: relative;
+    overflow: hidden; /* 可选：若要隐藏溢出内容 */
+  }
+  #heatmap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 模态窗口的背景 */
+  .modal {
+    display: none; /* 默认隐藏 */
+    position: fixed; /* 固定位置 */
+    z-index: 1000;   /* 置于顶层 */
+    left: 0;
+    top: 0;
+    width: 100%;     /* 全屏宽度 */
+    height: 100%;    /* 全屏高度 */
+    overflow: auto;  /* 如果需要滚动 */
+    background-color: rgba(0, 0, 0, 0.6); /* 半透明黑色背景 */
+    transition: opacity 0.3s ease;
+  }
+
+  /* 模态内容 */
+  .modal-content {
+    background-color: #ffffff;
+    margin: 5% auto; /* 5% 从顶部居中 */
+    padding: 20px;
+    border: none;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideIn 0.4s ease;
+  }
+
+  /* 弹入动画 */
+  @keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* 关闭按钮 */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* 文章列表样式 */
+  .article-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+
+  .article-list li {
+    margin: 8px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .article-list li:last-child {
+    border-bottom: none;
+  }
+
+  .article-list a {
+    text-decoration: none;
+    color: #196127;
+    font-size: 16px;
+    transition: color 0.2s ease;
+  }
+
+  .article-list a:hover {
+    color: #7bc96f;
+    text-decoration: underline;
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 600px) {
+    .modal-content {
+      width: 95%;
+      padding: 15px;
+    }
+
+    .close {
+      font-size: 24px;
+    }
+
+    .article-list a {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<!-- 热力图初始化脚本 -->
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    var chartDom = document.getElementById('heatmap');
+    var myChart = echarts.init(chartDom);
+
+    // 因为使用固定高度 250px，不再需要 setChartHeight / resize 处理
+    // 也无需监听 resize，如果您想在窗口变化时自适应宽度可以保留 myChart.resize()
+
+    var option;
+
+    // 初始化 Modal
+    var modal = document.getElementById("articleModal");
+    var span = document.getElementsByClassName("close")[0];
+
+    // 点击 (x) 关闭 Modal
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    // 点击模态外部关闭
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // 从 posts_heatmap.json 获取数据
+    fetch("/data/posts_heatmap.json")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok " + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // 准备 ECharts 的数据
+        var heatmapData = [];
+        for (const [date, categories] of Object.entries(data)) {
+          heatmapData.push([date, categories.totalWords]);
+        }
+
+        // 计算最近6个月日期范围
+        var endDate = new Date();
+        var startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 6);
+        var startDateStr = echarts.format.formatTime('yyyy-MM-dd', startDate);
+        var endDateStr = echarts.format.formatTime('yyyy-MM-dd', endDate);
+
+        option = {
+          title: {
+            show: false,
+            text: '摸鱼日记',
+            left: 'center',
+            top: 20,
+            textStyle: {
+              fontSize: 18,
+              fontWeight: 'bold',
+              color: '#333'
+            }
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: function (params) {
+              const date = params.data[0];
+              const totalWords = params.data[1];
+              const postCount = data[date] ? data[date].posts.length : 0;
+              const momentCount = data[date] ? data[date].momentCount : 0;
+
+              let tooltipContent = `<strong>${date}</strong><br/>总字数: ${totalWords} 千字`;
+              if (postCount > 0) tooltipContent += `<br/>文章数量: ${postCount}`;
+              if (momentCount > 0) tooltipContent += `<br/>瞬间数量: ${momentCount}`;
+              return tooltipContent;
+            }
+          },
+          visualMap: {
+            show: false,
+            min: 0,
+            max: 1, // 根据实际数据范围调
+            type: 'piecewise',
+            orient: 'horizontal',
+            left: 'center',
+            top: 60,
+            inRange: {
+              // GitHub 风格绿色梯度
+              color: ['#c6e48b', '#7bc96f', '#239a3b', '#196127']
+            },
+            splitNumber: 4,
+            text: ['', ''],
+            showLabel: true,
+            itemGap: 20,
+            padding: [0, 0, 10, 0]
+          },
+          calendar: {
+            top: 50,
+            left: 20,
+            right: 4,
+            cellSize: ['auto', 20],
+            range: [startDateStr, endDateStr],
+            itemStyle: {
+              color: '#f5f5f500',
+              borderWidth: 1,
+              borderColor: '#e6e6e675',
+              borderRadius: 0,
+              shadowBlur: 1,
+              shadowColor: 'rgba(0,0,0,0.1)'
+            },
+            yearLabel: { show: true },
+            monthLabel: { nameMap: 'cn', color: '#999', fontSize: 12 },
+            dayLabel: {
+              firstDay: 0,
+              nameMap: ['日', '一', '二', '三', '四', '五', '六'],
+              color: '#999',
+              fontSize: 12
+            },
+            splitLine: {
+              lineStyle: {
+                color: 'rgba(0, 0, 0, 0.0)',
+              }
+            }
+          },
+          series: {
+            type: 'heatmap',
+            coordinateSystem: 'calendar',
+            data: heatmapData,
+          }
+        };
+        myChart.setOption(option);
+
+        // 添加点击事件，显示 Modal
+        myChart.on('click', function(params) {
+          if (params.componentType === 'series') {
+            const date = params.data[0];
+            const postCount = data[date] ? data[date].posts.length : 0;
+            if (data[date] && postCount > 0) {
+              document.getElementById('modalDate').innerText = date;
+              var postsList = document.getElementById('modalPosts');
+              postsList.innerHTML = '';
+
+              // 列出当日的所有 posts
+              data[date].posts.forEach(function(post) {
+                var li = document.createElement('li');
+                li.innerHTML = `<a href="${post.link}" target="_blank">${post.title}｜${post.words}千字</a>`;
+                postsList.appendChild(li);
+              });
+              modal.style.display = "block";
+            }
+          }
+        });
+      })
+      .catch(error => {
+        console.error("加载 posts_heatmap.json 时出错：", error);
+      });
+  });
+</script>

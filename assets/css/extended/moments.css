@@ -1,0 +1,357 @@
+/* 
+  全局：亮色模式下的默认值
+  说明：PaperMod 会在 <html> 或 <body> 上添加 .dark 类切换暗色，
+       所以这里只需定义默认(亮色)和暗色时的变量即可。
+*/
+:root {
+    --card-bg: #fff;
+    --card-text: #333;
+    --tag-bg: #f2f4f5;
+    --tag-text: #333;
+    --comment-btn-color: #999;
+    --time-color: #999;
+    --tag-filter-bg: #fff;
+    --tag-filter-text: #333;
+    --tag-filter-hover-bg: #55ac68;
+    --gradient-mask: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 100%);
+}
+  
+/* 暗色模式下的变量 */
+.dark {
+  --card-bg: rgb(46, 46, 51); 
+  --card-text: rgb(196, 196, 197);      /* 对比度够高的浅色文字 */
+  --tag-bg: rgb(65, 66, 68);      /* 比卡片再浅一些，或自己喜欢的颜色 */
+  --tag-text: #eee;
+  --comment-btn-color: #aaa;
+  --time-color: #ccc;
+  --tag-filter-bg: #555;
+  --tag-filter-text: #ddd;
+  --tag-filter-hover-bg: #55ac68;
+  --gradient-mask: linear-gradient(180deg, rgba(46, 46, 51, 0), rgb(46, 46, 51) 100%);
+  --tag-filter-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* 新增暗色阴影变量 */
+}
+
+/* 单列容器：依旧保持 vertical 布局 */
+.moments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* 卡片：使用CSS变量 */
+.moment-card {
+  width: 100%;
+  max-width: 800px;        /* 每张卡片最多800px */
+  margin: 0 auto;          /* 居中 */
+  position: relative;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: none; /* 初始隐藏，由JS控制显示 */
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.moment-card.hidden {
+  display: none;  /* 隐藏元素并且不占据空间 */
+}
+
+/* 头像 & 作者 */
+.moment-header {
+  position: relative;
+  display: flex; /* 水平排列头像、昵称和按钮 */
+  align-items: center;  /* 垂直居中 */
+  justify-content: space-between;  /* 头像和昵称左对齐，按钮右对齐 */
+}
+
+.moment-header .left-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;  /* 固定间距，控制头像和昵称之间的距离 */
+}
+
+.moment-avatar{
+  width: 40px;
+  height: 40px;
+  object-fit: cover; /* 保证图片不变形 */
+  border-radius: 4px;
+  transition: transform 1s ease; /* 平滑的旋转过渡效果 */
+  cursor: pointer; /* 鼠标悬停时显示为可点击 */
+}
+
+.moment-avatar:active {
+  transform: rotate(360deg); /* 点击时旋转一圈 */
+}
+
+.moment-author {
+  font-weight: 600;
+  font-size: 16px;
+  /* 跟随卡片文字颜色 */
+  color: var(--card-text);
+}
+
+/* 主体内容 */
+.moment-body {
+  font-size: 16px;
+  color: var(--card-text);
+  padding: 0;
+  line-height: 1.5;
+}
+
+.moment-body p {
+  margin-bottom: 0.6rem; /* 默认值可能是 1rem，改为 0.75rem 或更小 */
+  line-height: 1.6;      /* 确保行间距仍然易读 */
+}
+
+.moment-body ol {
+  padding-left: 1rem; /* 调整左侧内边距，避免序号超出范围 */
+  margin-left: 0; /* 确保整体左对齐 */
+  list-style-position: inside; /* 确保序号在内容外部显示 */
+}
+
+.image-row {
+  display: grid;
+  gap: 0.4rem; /* 默认图片之间的间距 */
+  margin: 1rem 0; /* 上下与其他内容的间距 */
+}
+
+.image-row-1col {
+  grid-template-columns: repeat(1, 1fr); /* 单列布局 */
+}
+
+.image-row-2col {
+  grid-template-columns: repeat(2, 1fr); /* 双列布局 */
+  gap: 0.4rem; /* 自定义两列间距 */
+}
+
+.image-row-3col {
+  grid-template-columns: repeat(3, 1fr); /* 三列布局 */
+  gap: 0.2rem; /* 自定义三列间距 */
+}
+
+.image-row img {
+  width: 100%;                /* 图片宽度占满格子 */
+  aspect-ratio: 1 / 1;        /* 强制为正方形 */
+  object-fit: cover;          /* 裁切图片内容，居中显示 */
+  display: block;             /* 避免周围多余间隙 */
+  border-radius: 2px;         /* 可选：增加圆角 */
+}
+
+/* 标签 */
+.moment-tags {
+  margin-bottom: 1rem;
+}
+
+.moment-tag {
+  display: inline-block;
+  padding: 0.3em 0.6em;
+  margin-right: 0.5em;
+  margin-top: 1.2em;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+/* 底部：时间 + 评论按钮 */
+.moment-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.moment-time span {
+  font-size: 14px;
+  color: var(--time-color); /* 比主体更淡一点 */
+}
+
+/* 评论按钮 */
+.moment-comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  /* 使用变量 color */
+  color: var(--comment-btn-color);
+  transition: color 0.2s;
+  font-size: 14px;
+}
+
+.moment-comment-btn:hover {
+  /* 可在暗色下也进行不同程度的 hover 颜色变化 */
+  color: var(--card-text); 
+}
+
+.moment-comment-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.moment-comment-btn .comment-text {
+  margin-left: 0.3em;
+}
+
+/* 评论容器激活时 */
+.waline-container.active {
+  display: grid; /* 使用 flex 布局确保子元素正确排列 */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgb(223, 223, 223);
+  font-weight: normal;
+  box-sizing: border-box;
+}
+
+.waline-container .wl-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.waline-container .wl-avatar img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.waline-container .wl-cards .wl-user .wl-user-avatar {
+  margin-top: 1em;
+  margin-right: 0.25em;
+}
+
+.waline-container .wl-cards .wl-user .verified-icon{
+  display: none; 
+}
+
+/* 顶部筛选标签样式 */
+.tags-filter {
+  margin-bottom: 20px;
+}
+
+.tags-filter ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tags-filter li {
+  margin: 0;
+}
+
+.tags-filter .tag-filter {
+  text-decoration: none;
+  color: var(--tag-filter-text);
+  cursor: pointer;
+  padding: 8px 16px;
+  background-color: var(--tag-filter-bg);
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-weight: normal;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 缩小垂直偏移，降低透明度 */
+}
+
+.tag-filter.selected {
+  background-color: var(--tag-filter-hover-bg);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(85, 172, 104, 0.1); /* 减少扩散半径和透明度 */
+}
+
+.tag-filter:hover {
+  background-color: var(--tag-filter-hover-bg);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(85, 172, 104, 0.15); /* 保持微移效果但降低阴影强度 */
+}
+
+go.moment-loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--card-text);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-hint {
+    text-align: center;
+    padding: 0.5rem 0;
+    color: var(--card-text);
+    margin: 0 auto;
+    max-width: 600px;
+    opacity: 0.7;
+    font-size: 0.9em;
+    transition: opacity 0.3s ease;
+}
+
+.loading-hint[style*="block"], 
+.end-divider {
+    display: block !important;
+}
+
+.end-hint {
+    text-align: center;
+    padding: 2rem 0;
+    position: relative;
+}
+
+.end-divider {
+    color: #dcdcdc;
+    font-size: 0.9em;
+    text-align: center;
+    width: 100%;
+    padding: 2rem 0;
+    margin: 0 auto;
+}
+
+/* 修复提示容器样式（新增） */
+.scroll-hint-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-size: 0.95em;
+}
+
+.skeleton-content {
+    width: 100%;
+    padding: 0.5rem 0;
+}
+
+.skeleton-line {
+    height: 16px;
+    background: linear-gradient(90deg, var(--card-bg) 25%, rgba(128, 128, 128, 0.1) 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

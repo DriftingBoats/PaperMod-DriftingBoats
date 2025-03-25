@@ -1,0 +1,46 @@
+{{- $scratch := newScratch }}
+
+{{- /* 显示发布日期 */ -}}
+{{- if not .Date.IsZero -}}
+  {{- $formattedDate := .Date.Format (default "2006-01-02 15:04" site.Params.DateFormat) }}
+  {{- $scratch.Add "meta" (slice (printf "<span title='%s'>%s</span>" .Date $formattedDate)) }}
+{{- end }}
+
+{{- /* 检查 Lastmod 和 Date 是否相差至少一天 */ -}}
+{{- if gt .Lastmod .Date -}}
+  {{- $lastUnix := .Lastmod.Unix }}
+  {{- $dateUnix := .Date.Unix }}
+  {{- $diffSeconds := sub $lastUnix $dateUnix }}
+  {{- $diffDays := div $diffSeconds 86400 }}
+
+  {{- if ge $diffDays 1 }}
+    {{- $formattedLastmod := .Lastmod.Format (default "2006-01-02 15:04" site.Params.DateFormat) }}
+    {{- $scratch.Add "meta" (slice (printf "<span title='%s'>(更新于: %s)</span>" .Lastmod $formattedLastmod)) }}
+  {{- end }}
+{{- end }}
+
+{{- /* 显示阅读时间 */ -}}
+{{- if .Param "ShowReadingTime" -}}
+  {{- $readTime := i18n "read_time" .ReadingTime | default (printf "%d min" .ReadingTime) }}
+  {{- $scratch.Add "meta" (slice $readTime) }}
+{{- end }}
+
+{{- /* 显示字数统计 */ -}}
+{{- if .Param "ShowWordCount" -}}
+  {{- $wordCount := i18n "words" .WordCount | default (printf "%d words" .WordCount) }}
+  {{- $scratch.Add "meta" (slice $wordCount) }}
+{{- end }}
+
+{{- /* 显示作者信息 */ -}}
+{{- if not (.Param "hideAuthor") -}}
+  {{- with (partial "author.html" .) }}
+    {{- $scratch.Add "meta" (slice .) }}
+  {{- end }}
+{{- end }}
+
+{{- /* 输出所有元信息，用 · 分隔，并包裹在左对齐的容器中 */ -}}
+{{- with ($scratch.Get "meta") }}
+  <div class="meta-left-align">
+    {{- delimit . "&nbsp;&nbsp;·&nbsp;&nbsp;" | safeHTML -}}
+  </div>
+{{- end }}
