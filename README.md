@@ -28,7 +28,7 @@ git init .
 4. 安装 PaperMod-PE 主题
 
 ```powershell
-git submodule add --depth=1 https://github.com/DriftingBoats/Drifitng-PaperMod.git themes/Drifitng-PaperMod
+git submodule add --depth=1 https://github.com/DriftingBoats/Drifting-PaperMod.git themes/Drifting-PaperMod
 ```
 
 5. 修改 Hugo 配置文件：
