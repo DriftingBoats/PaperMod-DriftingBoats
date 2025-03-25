@@ -37,5 +37,24 @@ git submodule add --depth=1 https://github.com/DriftingBoats/Drifting-PaperMod.g
 theme: Drifitng-PaperMod
 ```
 
+## 更新主题
+
+```bash
+# 进入子模块
+cd themes/Drifting-PaperMod
+
+# 强制同步远程最新状态（假设接受覆盖本地）
+git fetch --depth=1 origin master
+git reset --hard origin/master
+
+# 返回主项目并提交
+cd ../..
+git add themes/Drifting-PaperMod
+git commit -m "Fix submodule divergence and update to latest"
+
+# 推送主项目更新（如果需要）
+git push origin main
+```
+
 ## 示例Hugo.yaml
 
