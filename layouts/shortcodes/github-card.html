@@ -1,0 +1,269 @@
+{{ $repo := .Get 0 }}
+<div class="github-card" id="github-card-{{ $repo | replace "/" "-" }}">
+  <a class="github-card-link" href="https://github.com/{{ $repo }}" target="_blank" rel="noopener noreferrer">
+    <!-- Header：左侧显示头像和仓库名称（下方带描述），右侧显示 GitHub Badge -->
+    <div class="github-card-header">
+      <div class="header-left">
+        <div class="github-avatar"></div>
+        <div class="repo-info">
+          <div class="repo-name">{{ $repo }}</div>
+          <div class="repo-description">Loading...</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <svg class="github-badge" viewBox="0 0 16 16" version="1.1" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+      </div>
+    </div>
+    <!-- Footer：显示主要语言、Star 和 Fork 数量 -->
+    <div class="github-card-footer">
+      <div class="footer-item">
+        <span class="language-dot"></span>
+        <span class="language"></span>
+      </div>
+      <div class="footer-item">
+        <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path></svg>
+        <span class="stars"></span>
+      </div>
+      <div class="footer-item">
+        <svg class="octicon" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z"></path></svg>
+        <span class="forks"></span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- CSS 样式 -->
+<style>
+  /* 整体卡片样式 */
+  .github-card {
+    width: 100%;
+    margin: 1em 0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1px solid rgba(208, 215, 222, 0.6);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    overflow: hidden;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .github-card:hover {
+    background-color: #f6f8fa;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+  }
+  .github-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  /* Header 部分 */
+  .github-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.2em;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+  }
+  .github-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2NjYyIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MyLjY3IDAgOC0xLjMzIDgtM3Y5LjE2Yy0yLjUgMS40NC00Ljc0IDEuODQtOCAxLjg0cy01LjUtLjQtOC0xLjg0VjJjMCAxLjY3IDUuMzMgMyA4IDN6Ii8+PC9zdmc+');
+  }
+  .github-card:hover .github-avatar {
+    transform: scale(1.05);
+  }
+  .repo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+  }
+  .repo-name {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #0969da;
+    letter-spacing: -0.01em;
+  }
+  .repo-description {
+    font-size: 0.9em;
+    color: #57606a;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .header-right {
+    margin-left: auto;
+  }
+  .github-badge {
+    width: 24px;
+    height: 24px;
+    color: #57606a;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .github-card:hover .github-badge {
+    transform: scale(1.1);
+    color: #24292f;
+  }
+  /* Footer 部分 */
+  .github-card-footer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1.5em;
+    padding: 0.8em 1.2em;
+    font-size: 0.85em;
+    color: #57606a;
+  }
+  .footer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  .footer-item .octicon {
+    fill: currentColor;
+  }
+  .language-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: var(--language-color, #ccc);
+  }
+  /* 响应式设置 */
+  @media (max-width: 480px) {
+    .github-card {
+      margin: 1em 0;
+      width: 100%;
+      border-radius: 10px;
+    }
+    .github-card-header {
+      padding: 1em;
+    }
+    .header-left {
+      gap: 0.6em;
+      align-items: flex-start;
+    }
+    .github-avatar {
+      width: 32px;
+      height: 32px;
+      margin-top: 0.2em;
+    }
+    .repo-info {
+      gap: 0.3em;
+    }
+    .repo-name {
+      font-size: 1em;
+      line-height: 1.3;
+    }
+    .repo-description {
+      font-size: 0.85em;
+      line-height: 1.4;
+    }
+    .github-card-footer {
+      padding: 0.8em 1em;
+      gap: 1.2em;
+    }
+  }
+  /* 深色模式适配 */
+  .dark .github-card {
+    background-color: #2a2a2a;
+    border-color: #404040;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .dark .github-card:hover {
+    background-color: #333333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  .dark .repo-name {
+    color: #58a6ff;
+  }
+  .dark .repo-description {
+    color: #d4d4d4;
+  }
+  .dark .github-card-footer {
+    color: #d4d4d4;
+  }
+  .dark .github-badge {
+    color: #d4d4d4;
+  }
+  .dark .github-card:hover .github-badge {
+    color: #ffffff;
+  }
+</style>
+
+<!-- JS：动态加载 GitHub 仓库信息 -->
+<script>
+  (function() {
+    const repo = "{{ $repo }}";
+    const cardId = "github-card-{{ $repo | replace "/" "-" }}";
+    
+    async function loadGitHubInfo(repo, elementId) {
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}`);
+        if (!response.ok) {
+          console.error("Failed to fetch GitHub repo data:", response.statusText);
+          return;
+        }
+        const data = await response.json();
+        const cardEl = document.getElementById(elementId);
+        if (!cardEl) return;
+        
+        // 更新头像
+        const avatarEl = cardEl.querySelector('.github-avatar');
+        if (avatarEl && data.owner.avatar_url) {
+          avatarEl.style.backgroundImage = `url(${data.owner.avatar_url})`;
+        }
+        // 更新仓库描述
+        const descEl = cardEl.querySelector('.repo-description');
+        if (descEl) {
+          descEl.textContent = data.description || "No description provided.";
+        }
+        // 更新主要语言、Star 和 Fork 数量
+        const langEl = cardEl.querySelector('.language');
+        const langDotEl = cardEl.querySelector('.language-dot');
+        if (langEl && langDotEl) {
+          langEl.textContent = data.language || "N/A";
+          if (data.language) {
+            const colors = {
+              "JavaScript": "#f1e05a",
+              "Python": "#3572A5",
+              "Java": "#b07219",
+              "TypeScript": "#2b7489",
+              "C++": "#f34b7d",
+              "Ruby": "#701516",
+              "Go": "#00ADD8",
+              "Rust": "#dea584",
+              "PHP": "#4F5D95",
+              "HTML": "#e34c26",
+              "CSS": "#563d7c",
+              "Vue": "#41b883",
+              "Shell": "#89e051"
+            };
+            langDotEl.style.setProperty('--language-color', colors[data.language] || '#ccc');
+          }
+        }
+        
+        const starsEl = cardEl.querySelector('.stars');
+        if (starsEl) starsEl.textContent = data.stargazers_count;
+        
+        const forksEl = cardEl.querySelector('.forks');
+        if (forksEl) forksEl.textContent = data.forks_count;
+      } catch (e) {
+        console.error("Error fetching GitHub repo data:", e);
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGitHubInfo(repo, cardId);
+    });
+  })();
+</script>
