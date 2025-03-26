@@ -241,28 +241,33 @@ margin: 0;
 
 .tags-filter .tag-filter {
 text-decoration: none;
-color: var(--tag-filter-text);
+color: var(--tag-filter-text, var(--primary));
 cursor: pointer;
 padding: 8px 16px;
-background-color: var(--tag-filter-bg);
+background-color: var(--tag-filter-bg, #f5f5f5);
+border: 1px solid rgba(0, 0, 0, 0.04);
 border-radius: 20px;
 font-size: 14px;
 transition: all 0.3s ease;
 font-weight: normal;
-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 缩小垂直偏移，降低透明度 */
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+display: flex;
+align-items: center;
 }
 
 .tag-filter.selected {
-background-color: var(--tag-filter-hover-bg);
+background-color: var(--tag-filter-hover-bg, var(--primary));
 color: #fff;
 font-weight: bold;
-box-shadow: 0 2px 4px rgba(85, 172, 104, 0.1); /* 减少扩散半径和透明度 */
+box-shadow: 0 2px 6px rgba(85, 172, 104, 0.15);
+transform: translateY(-1px);
 }
 
 .tag-filter:hover {
-background-color: var(--tag-filter-hover-bg);
+background-color: var(--tag-filter-hover-bg, var(--primary));
 color: #fff;
 transform: translateY(-1px);
+box-shadow: 0 2px 6px rgba(85, 172, 104, 0.15);
 box-shadow: 0 2px 6px rgba(85, 172, 104, 0.15); /* 保持微移效果但降低阴影强度 */
 }
 
