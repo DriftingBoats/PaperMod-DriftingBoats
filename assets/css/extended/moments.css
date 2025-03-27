@@ -271,7 +271,7 @@ transform: translateY(-1px);
 }
 
 .tag-filter.selected sup {
-color: rgba(255, 255, 255, 0.9);
+color: #e6e6e6;
 opacity: 1;
 }
 
