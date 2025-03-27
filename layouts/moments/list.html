@@ -21,8 +21,8 @@
             <ul>
                 <!-- 计算所有moments的数量 -->
                 {{ $totalCount := len .Pages }}
-                <li><a href="#" class="tag-filter all-tags">全部</a></li> <!-- "全部"选项 -->
-                <!-- 显示数量的代码：<li><a href="#" class="tag-filter all-tags">全部 <sup><strong><sup>{{ $totalCount }}</sup></strong></sup></a></li> -->
+                <li><a href="#" class="tag-filter all-tags">全部 <sup><strong><sup>{{ $totalCount }}</sup></strong></sup></a></li>
+                <!-- 全部Tag不显示数量的代码：<li><a href="#" class="tag-filter all-tags">全部</a></li> -->
                 {{ $tags := slice }} <!-- 用于存储所有标签 -->
                 {{ $tagCounts := dict }} <!-- 用于存储每个标签的计数 -->
                 
