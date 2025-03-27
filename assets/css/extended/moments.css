@@ -253,6 +253,13 @@ font-weight: normal;
 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 display: flex;
 align-items: center;
+gap: 4px;
+}
+
+.tags-filter .tag-filter sup {
+color: var(--secondary);
+opacity: 0.8;
+margin-left: 2px;
 }
 
 .tag-filter.selected {
@@ -261,6 +268,11 @@ color: #fff;
 font-weight: bold;
 box-shadow: 0 2px 6px rgba(85, 172, 104, 0.15);
 transform: translateY(-1px);
+}
+
+.tag-filter.selected sup {
+color: rgba(255, 255, 255, 0.9);
+opacity: 1;
 }
 
 .tag-filter:hover {

@@ -8,7 +8,6 @@
         integrity="{{ $css.Data.Integrity }}"
         rel="stylesheet"
     />
-    <link href="https://unpkg.com/@waline/client@v3/dist/waline.css" rel="stylesheet" />
 
     {{ $dateformat := .Params.DateFormat }}
 
@@ -20,22 +19,35 @@
 
         <div class="tags-filter">
             <ul>
+                <!-- 计算所有moments的数量 -->
+                {{ $totalCount := len .Pages }}
                 <li><a href="#" class="tag-filter all-tags">全部</a></li> <!-- "全部"选项 -->
+                <!-- 显示数量的代码：<li><a href="#" class="tag-filter all-tags">全部 <sup><strong><sup>{{ $totalCount }}</sup></strong></sup></a></li> -->
                 {{ $tags := slice }} <!-- 用于存储所有标签 -->
+                {{ $tagCounts := dict }} <!-- 用于存储每个标签的计数 -->
                 
                 {{ range .Pages }}
                     {{ range .Params.tags }}
                         {{ if not (in $tags .) }}
                             {{ $tags = $tags | append . }}
+                            {{ $tagCounts = dict . 1 | merge $tagCounts }}
+                        {{ else }}
+                            {{ $count := index $tagCounts . }}
+                            {{ $tagCounts = dict . (add $count 1) | merge $tagCounts }}
                         {{ end }}
                     {{ end }}
                 {{ end }}
         
-                <!-- 按字母顺序排序标签 -->
-                {{ $tags = $tags | sort }}
+                <!-- 按标签内容数量降序排列 -->
+                {{ $sortedTags := slice }}
+                {{ range $tag := $tags }}
+                    {{ $count := index $tagCounts $tag }}
+                    {{ $sortedTags = $sortedTags | append (dict "tag" $tag "count" $count) }}
+                {{ end }}
+                {{ $sortedTags = sort $sortedTags "count" "desc" }}
         
-                {{ range $tags }}
-                    <li><a href="#" class="tag-filter">{{ . }}</a></li> <!-- 标签项 -->
+                {{ range $sortedTags }}
+                    <li><a href="#" class="tag-filter" data-tag="{{ .tag }}">{{ .tag }} <sup><strong><sup>{{ .count }}</sup></strong></sup></a></li> <!-- 标签项 -->
                 {{ end }}
             </ul>
         </div>        
@@ -67,9 +79,9 @@
                                 </div>
                                 <div class="moment-loading">
                                     <div class="loading-spinner"></div>
+                                    <div class="loading-text">图片加载中...</div>
                                     <div class="skeleton-content">
                                         <div class="skeleton-line" style="width: 90%"></div>
-                                        <div class="skeleton-line" style="width: 75%"></div>
                                         <div class="skeleton-line" style="width: 60%"></div>
                                     </div>
                                 </div>
@@ -214,7 +226,7 @@
             // 新增分页相关变量
             let currentPage = 1;
             const pageSize = {{ .Site.Params.moments.pageSize | default 8 }};
-            let filteredMoments = [];
+            let filteredMoments = Array.from(document.querySelectorAll('.moment-card')); // 初始化时包含所有卡片
             let isLoading = false;
             let isAllLoaded = false;
             let loadingTimeout = null;
@@ -222,6 +234,9 @@
             loadingHint.className = 'scroll-hint-container';
             loadingHint.innerHTML = '<div class="loading-hint">加载更多...</div>';
             document.querySelector('.moments-list').after(loadingHint);
+            
+            // 页面加载完成后立即显示内容
+            displayMoments();
 
             // 显示分页内容的方法
             function displayMoments() {
@@ -285,7 +300,6 @@
             const tags = document.querySelectorAll('.tag-filter');  // 获取所有标签
             const moments = document.querySelectorAll('.moment-card');  // 获取所有 moment 卡片
             const allTags = document.querySelector('.all-tags');  // 获取"全部"按钮
-            const momentTags = document.querySelectorAll('.moment-tag'); // 获取所有卡片内的标签
 
             // 默认选中"全部"标签
             if (allTags) {
@@ -296,17 +310,29 @@
             tags.forEach(tag => {
                 tag.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const selectedTag = tag.textContent.trim();
+                    const selectedTag = tag.classList.contains('all-tags') ? '全部' : tag.dataset.tag; // 使用data-tag属性获取纯标签名称
                     
-                    // 隐藏所有 moments
-                    moments.forEach(moment => {
-                        moment.style.display = 'none';
+                    // 移除所有标签的选中状态
+                    tags.forEach(t => t.classList.remove('selected'));
+                    // 为当前点击的标签添加选中状态
+                    tag.classList.add('selected');
+                    
+                    // 筛选卡片
+                    document.querySelectorAll('.moment-card').forEach(card => {
+                        if (selectedTag === '全部') {
+                            card.style.display = 'block';
+                            return;
+                        }
+                        
+                        const cardTags = Array.from(card.querySelectorAll('.moment-tag'));
+                        const hasTag = cardTags.some(t => t.textContent.trim() === selectedTag);
+                        card.style.display = hasTag ? 'block' : 'none';
                     });
                     
                     filteredMoments = Array.from(moments).filter(moment => {
                         const momentTags = moment.querySelectorAll('.moment-tag');
                         return selectedTag === '全部' || 
-                            Array.from(momentTags).some(t => t.textContent === selectedTag);
+                            Array.from(momentTags).some(tag => tag.textContent.trim() === selectedTag);
                     });
 
                     currentPage = 1;
@@ -315,22 +341,31 @@
                     
                     tags.forEach(t => t.classList.remove('selected'));
                     tag.classList.add('selected');
+                    
+                    // 重新绑定卡片内标签点击事件
+                    bindMomentTagsClickEvent();
                 });
             });
 
             // 为卡片内的标签添加点击事件
-            momentTags.forEach(tag => {
-                tag.style.cursor = 'pointer';
-                tag.addEventListener('click', function() {
-                    const tagText = this.textContent.trim();
-                    // 找到对应的顶部标签并触发点击
-                    tags.forEach(headerTag => {
-                        if (headerTag.textContent.trim() === tagText) {
-                            headerTag.click();
-                        }
+            const bindMomentTagsClickEvent = () => {
+                const momentTags = document.querySelectorAll('.moment-tag');
+                momentTags.forEach(tag => {
+                    tag.style.cursor = 'pointer';
+                    tag.addEventListener('click', function() {
+                        const tagText = this.textContent.trim();
+                        // 找到对应的顶部标签并触发点击
+                        tags.forEach(headerTag => {
+                            if (headerTag.dataset.tag === tagText) {
+                                headerTag.click();
+                            }
+                        });
                     });
                 });
-            });
+            };
+            
+            // 初始绑定卡片内标签点击事件
+            bindMomentTagsClickEvent();
 
             // 初始加载
             filteredMoments = Array.from(moments);
