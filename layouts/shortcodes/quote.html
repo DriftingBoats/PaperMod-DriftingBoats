@@ -8,7 +8,7 @@
 <style>
 .quote-card {
     background-color: #f8f9fa;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 1.5rem;
     margin: 1.5rem 0;
     position: relative;
@@ -24,6 +24,15 @@
 .quote-content {
     position: relative;
     padding-left: 2.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .quote-content {
+        padding-left: 0;
+    }
+    .quote-mark {
+        display: none;
+    }
 }
 
 .quote-mark {
